@@ -7,9 +7,10 @@
         <p style="color: green;">{{ session('success') }}</p>
     @endif
 
-    @if (count($cart) > 0)
+    @if ($items->count() > 0)
         <form method="POST" action="{{ route('cart.update') }}">
             @csrf
+            @method('PUT')
 
             @php
                 $total = 0;
@@ -26,22 +27,23 @@
                 </tr>
                 </thead>
                 <tbody>
-                @foreach ($cart as $id => $item)
+                @foreach ($items as $item)
                     @php
-                        $subtotal = $item['price'] * $item['quantity'];
+                        $product = $item->product;
+                        $subtotal = $product->price * $item->quantity;
                         $total += $subtotal;
                     @endphp
                     <tr>
-                        <td>{{ $item['name'] }}</td>
-                        <td>{{ number_format($item['price'], 2) }} грн</td>
+                        <td>{{ $product->name }}</td>
+                        <td>{{ number_format($product->price, 2) }} грн</td>
                         <td>
-                            <input type="number" name="quantities[{{ $id }}]" value="{{ $item['quantity'] }}" min="1" style="width: 60px;">
+                            <input type="number" name="quantities[{{ $item->id }}]" value="{{ $item->quantity }}" min="1" style="width: 60px;">
                         </td>
                         <td>{{ number_format($subtotal, 2) }} грн</td>
                         <td>
                             <form action="{{ route('cart.remove') }}" method="POST" style="display:inline;">
                                 @csrf
-                                <input type="hidden" name="product_id" value="{{ $id }}">
+                                <input type="hidden" name="item_id" value="{{ $item->id }}">
                                 <button type="submit">Удалить</button>
                             </form>
                         </td>
